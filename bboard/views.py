@@ -38,9 +38,39 @@ def index(request):
 from django.http import JsonResponse
 
 
-def my_view(request):
+def returner(request):
     data = [i for i in range(10)]
     return JsonResponse({'data': data})
+
+# views.py
+from django.shortcuts import redirect, reverse
+from django.contrib.auth.decorators import login_required
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+file_handler = logging.FileHandler('requests.log')
+file_handler.setLevel(logging.INFO)
+
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+
+logger.addHandler(file_handler)
+
+def log_request(request):
+    logger.info(f"Метод: {request.method}, Путь: {request.path}, Данные: {request.GET.dict() or request.POST.dict()}")
+
+@login_required
+def authorization(request):
+    log_request(request)
+    return HttpResponse("Вы авторизованы.")
+
+def redirect_if_not_logged_in(request):
+    log_request(request)
+    if not request.user.is_authenticated:
+        return redirect(reverse('bboard:index'))
+    return authorization(request)
 
 
 def by_rubric(request, rubric_id):
