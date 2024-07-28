@@ -1,8 +1,9 @@
 from django.db.models import Count
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.template import loader
-from django.urls import reverse_lazy
+from django.template.loader import render_to_string
+from django.urls import reverse_lazy, reverse
 from django.views.generic.edit import CreateView
 
 from bboard.forms import BbForm
@@ -10,21 +11,36 @@ from bboard.models import Bb, Rubric
 from testapp.views import SMSListView
 
 
-# def index(request):
-#     template = loader.get_template('bboard/index.html')
-#     bbs = Bb.objects.order_by('-published')
-#     context = {'bbs': bbs}
-#
-#     return HttpResponse(template.render(context, request))
+def add_and_save(request):
+    if request.method == 'POST':
+        bbf = BbForm(request.POST)
+        if bbf.is_valid():
+            bbf.save()
+            return HttpResponseRedirect(reverse('bboard:by_rubric',
+                                                kwargs={'rubric_id': bbf.cleaned_data['rubric'].pk}))
+        else:
+            context = {'form': bbf}
+            return render(request, 'bboard/create.html', context)
+    else:
+        bbf = BbForm()
+        context = {'form': bbf}
+        return render(request, 'bboard/create.html', context)
 
 
 def index(request):
-    bbs = Bb.objects.order_by('-published')
-    # rubrics = Rubric.objects.all()
-    rubrics = Rubric.objects.annotate(cnt=Count('bb')).filter(cnt__gt=0)
+    bbs = Bb.objects.all()
+    rubrics = Rubric.objects.all()
     context = {'bbs': bbs, 'rubrics': rubrics}
+    return HttpResponse(render_to_string('bboard/index.html',
+                                         context, request))
 
-    return render(request, 'bboard/index.html', context)
+
+from django.http import JsonResponse
+
+
+def my_view(request):
+    data = [i for i in range(10)]
+    return JsonResponse({'data': data})
 
 
 def by_rubric(request, rubric_id):
@@ -51,6 +67,7 @@ class BbCreateView(CreateView):
         # context['rubrics'] = Rubric.objects.all()
         context['rubrics'] = Rubric.objects.annotate(cnt=Count('bb')).filter(cnt__gt=0)
         return context
+
 
 def fromtestapp(request):
     return SMSListView(request)
