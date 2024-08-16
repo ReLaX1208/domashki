@@ -106,7 +106,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Task
 from .forms import TaskSerializer
-
 class TaskController(APIView):
     def get(self, request):
         tasks = Task.objects.all()
