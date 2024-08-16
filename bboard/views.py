@@ -10,6 +10,13 @@ from bboard.forms import BbForm
 from bboard.models import Bb, Rubric
 from testapp.views import SMSListView
 
+def user_form(request):
+    if request.method == 'GET':
+        pk = request.GET.get('pk')
+        if pk:
+            return HttpResponseRedirect(reverse('user_detail', args=[pk]))
+    return render(request, 'user_form.html')
+
 
 def add_and_save(request):
     if request.method == 'POST':
@@ -43,7 +50,7 @@ def returner(request):
     return JsonResponse({'data': data})
 
 # views.py
-from django.shortcuts import redirect, reverse
+from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 import logging
 
@@ -106,6 +113,18 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Task
 from .forms import TaskSerializer
+from .models import User
+from .forms import UserSerializer
+class UserController(APIView):
+    def get(self, request):
+        users = User.objects.all()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)
+
+    def get_user(self, request, pk):
+        user = User.objects.get(pk=pk)
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
 class TaskController(APIView):
     def get(self, request):
         tasks = Task.objects.all()

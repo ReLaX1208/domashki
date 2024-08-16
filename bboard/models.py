@@ -10,6 +10,15 @@ class Task(models.Model):
     def __str__(self):
         return self.title
 
+from django.contrib.auth.models import AbstractUser
+
+class User(AbstractUser):
+    first_name = models.CharField(max_length=150)
+    last_name = models.CharField(max_length=150)
+    email = models.EmailField(unique=True)
+
+    def __str__(self):
+        return f"{self.username} ({self.email})"
 def is_active_default():
     return True
 
