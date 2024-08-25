@@ -10,12 +10,7 @@ from bboard.forms import BbForm
 from bboard.models import Bb, Rubric
 from testapp.views import SMSListView
 
-def user_form(request):
-    if request.method == 'GET':
-        pk = request.GET.get('pk')
-        if pk:
-            return HttpResponseRedirect(reverse('user_detail', args=[pk]))
-    return render(request, 'user_form.html')
+
 
 
 def add_and_save(request):
@@ -42,42 +37,10 @@ def index(request):
                                          context, request))
 
 
-from django.http import JsonResponse
 
 
-def returner(request):
-    data = [i for i in range(10)]
-    return JsonResponse({'data': data})
 
-# views.py
-from django.shortcuts import redirect
-from django.contrib.auth.decorators import login_required
-import logging
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-file_handler = logging.FileHandler('requests.log')
-file_handler.setLevel(logging.INFO)
-
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-file_handler.setFormatter(formatter)
-
-logger.addHandler(file_handler)
-
-def log_request(request):
-    logger.info(f"Метод: {request.method}, Путь: {request.path}, Данные: {request.GET.dict() or request.POST.dict()}")
-
-@login_required
-def authorization(request):
-    log_request(request)
-    return HttpResponse("Вы авторизованы.")
-
-def redirect_if_not_logged_in(request):
-    log_request(request)
-    if not request.user.is_authenticated:
-        return redirect(reverse('bboard:index'))
-    return authorization(request)
 
 
 def by_rubric(request, rubric_id):
@@ -109,49 +72,4 @@ class BbCreateView(CreateView):
 def fromtestapp(request):
     return SMSListView(request)
 
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from .models import Task
-from .forms import TaskSerializer
-from .models import User
-from .forms import UserSerializer
-class UserController(APIView):
-    def get(self, request):
-        users = User.objects.all()
-        serializer = UserSerializer(users, many=True)
-        return Response(serializer.data)
 
-    def get_user(self, request, pk):
-        user = User.objects.get(pk=pk)
-        serializer = UserSerializer(user)
-        return Response(serializer.data)
-class TaskController(APIView):
-    def get(self, request):
-        tasks = Task.objects.all()
-        serializer = TaskSerializer(tasks, many=True)
-        return Response(serializer.data)
-
-    def post(self, request):
-        serializer = TaskSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
-
-    def get_task(self, request, pk):
-        task = Task.objects.get(pk=pk)
-        serializer = TaskSerializer(task)
-        return Response(serializer.data)
-
-    def put(self, request, pk):
-        task = Task.objects.get(pk=pk)
-        serializer = TaskSerializer(task, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=400)
-
-    def delete(self, request, pk):
-        task = Task.objects.get(pk=pk)
-        task.delete()
-        return Response(status=204)
