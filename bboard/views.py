@@ -1,6 +1,7 @@
+from django.contrib import messages
 from django.db.models import Count
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.template import loader
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy, reverse
@@ -9,8 +10,20 @@ from django.views.generic.edit import CreateView
 from bboard.forms import BbForm
 from bboard.models import Bb, Rubric
 from testapp.views import SMSListView
+from bboard.forms import MyForm
 
+def my_controller(request):
+    if request.method == 'POST':
+        form = MyForm(request.POST)
+        if form.is_valid():
+            messages.success(request, 'Form submitted successfully!')
+            return redirect('bboard:index')
+        else:
+            messages.error(request, 'Form is invalid. Please try again.')
+    else:
+        form = MyForm()
 
+    return render(request, 'bboard/da.html', {'form': form})
 
 
 def add_and_save(request):

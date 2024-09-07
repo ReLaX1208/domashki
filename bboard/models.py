@@ -25,6 +25,10 @@ class MinMaxValueValidator:
                                   code='out_of_range',
                                   params={'min': self.min_value, 'max': self.max_value})
 
+class MyForm(models.Model):
+    name = models.CharField(verbose_name='Name', max_length=100)
+    email = models.EmailField(verbose_name='Email')
+    message = models.CharField(verbose_name='Message', max_length=100)
 
 class Rubric(models.Model):
     name = models.CharField(max_length=20, db_index=True, unique=True,
