@@ -8,10 +8,18 @@ from django.contrib.postgres.fields import DateTimeRangeField, ArrayField, HStor
 from django.db import models
 from localflavor.us.models import USStateField
 
+class Event(models.Model):
+    name = models.CharField(max_length =255)
+    duration = DateTimeRangeField()
+
+    def __str__(self):
+        return self.name
 class Address(models.Model):
     state = USStateField()
     city = models.CharField(max_length=255)
     zip_code = models.CharField(max_length=10)
+
+
 class AdvUser(models.Model):
     is_activated = models.BooleanField(default=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -28,7 +36,7 @@ class Spare(models.Model):
 class Machine(models.Model):
     name = models.CharField(max_length=30)
     spares = models.ManyToManyField(Spare, through='Kit',
-                                   through_fields=('machine', 'spare'))
+                                    through_fields=('machine', 'spare'))
     notes = GenericRelation('Note')
 
     def __str__(self):

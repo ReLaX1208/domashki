@@ -2,8 +2,10 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import ListView
 
-from .models import SMS
-
+from .models import SMS, Event
+def event_list(request):
+    events = Event.objects.all()
+    return render(request, 'event_list.html', {'events': events})
 class SMSListView(ListView):
     model = SMS
     template_name = 'testapp/sms_list.html'
