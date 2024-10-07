@@ -43,6 +43,9 @@ INSTALLED_APPS = [
     'bboard.apps.BboardConfig',
     'testapp',
     'django_bootstrap5',
+    'django.contrib.postgres',
+    'localflavor',
+
 ]
 
 MIDDLEWARE = [
