@@ -3,17 +3,20 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
-from django.contrib.postgres.fields import DateTimeRangeField, ArrayField, HStoreField, CICharField
+from django.contrib.postgres.fields import DateTimeRangeField
 
 from django.db import models
 from localflavor.us.models import USStateField
 
+
 class Event(models.Model):
-    name = models.CharField(max_length =255)
+    name = models.CharField(max_length=255)
     duration = DateTimeRangeField()
 
     def __str__(self):
         return self.name
+
+
 class Address(models.Model):
     state = USStateField()
     city = models.CharField(max_length=255)
