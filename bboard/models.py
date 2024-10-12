@@ -57,6 +57,7 @@ class Rubric(models.Model):
         ordering = ['name', '-photo']
 
 
+
 class BbManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().order_by('price')
@@ -127,3 +128,5 @@ class Bb(models.Model):
 
 class UploadFiles(models.Model):
     file = models.FileField(upload_to='uploads_model')
+class FileUpload(models.Model):
+    file = models.FileField(upload_to='uploads_files')

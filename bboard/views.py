@@ -20,7 +20,7 @@ from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import CreateView, FormView, UpdateView, DeleteView
 
 from bboard.forms import BbForm, RubricFormSet, RubricForm, RegisterUserForm, LoginUserForm, SearchForm, \
-    UserPasswordChangeForm, ProfileUserForm, UploadFileForm
+    UserPasswordChangeForm, ProfileUserForm, UploadFileForm, FileUploadForm
 from bboard.models import Bb, Rubric, UploadFiles
 
 
@@ -112,6 +112,15 @@ class BbEditView(LoginRequiredMixin, UpdateView):
 def commit_handler():
     print('Транзакция закоммичена')
 
+def file_upload_view(request):
+    if request.method == 'POST':
+        form = FileUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return render(request, 'success.html', {'message': 'File uploaded successfully'})
+    else:
+        form = FileUploadForm()
+    return render(request, 'bboard/file_upload.html', {'form': form})
 
 @require_http_methods(['GET', 'POST'])
 @login_required(login_url='login')

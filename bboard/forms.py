@@ -2,13 +2,12 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, PasswordChangeForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-# from django.core import validators
 from django.forms import (ModelForm, modelform_factory, DecimalField,
                           modelformset_factory, BaseModelFormSet)
 from django.forms.widgets import Select, TextInput, PasswordInput
 from django import forms
 
-from bboard.models import Bb, Rubric
+from bboard.models import Bb, Rubric, FileUpload
 from captcha.fields import CaptchaField
 
 
@@ -139,3 +138,7 @@ class ProfileUserForm(forms.ModelForm):
 
 class UploadFileForm(forms.Form):
     file = forms.ImageField(label="Файл")
+class FileUploadForm(forms.ModelForm):
+    class Meta:
+        model = FileUpload
+        fields = ('file',)

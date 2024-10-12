@@ -22,7 +22,7 @@ from django.contrib.auth.views import LogoutView, PasswordChangeDoneView, Passwo
     PasswordResetConfirmView, PasswordResetCompleteView
 from django.urls import path, include, reverse_lazy
 
-from bboard.views import LoginUser, RegisterUser, UserPasswordChange, ProfileUser
+from bboard.views import LoginUser, RegisterUser, UserPasswordChange, ProfileUser, file_upload_view
 from samplesite import settings
 
 urlpatterns = [
@@ -49,6 +49,7 @@ urlpatterns = [
     path('password-reset/complete/',
          PasswordResetCompleteView.as_view(template_name="registration/password_reset_complete.html"),
          name='password_reset_complete'),
+    path('file_upload/', file_upload_view, name='file_upload'),
 ]
 urlpatterns += [
     path('captcha/', include('captcha.urls')),
