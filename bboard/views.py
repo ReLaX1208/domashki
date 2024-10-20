@@ -236,21 +236,11 @@ class RubricDeleteView(LoginRequiredMixin, DeleteView):
 @login_required(login_url='login')
 @require_http_methods(['GET', 'POST'])
 def rubrics(request):
-    bbs = Bb.objects.order_by('-published')
-    rubrics = Rubric.objects.all().order_by_bb_count()
-
-    paginator = Paginator(bbs, 6)
-
-    if 'page' in request.GET:
-        page_num = request.GET['page']
-    else:
-        page_num = 1
-
-    page = paginator.get_page(page_num)
-
-    context = {'rubrics': rubrics, 'bbs': page.object_list, 'page': page}
-
-    return render(request, 'bboard/rubrics.html', context)
+    user_groups = request.user.groups.all() if request.user.is_authenticated else []
+    return {
+        'rubrics': Rubric.objects.all(),
+        'user_groups': user_groups,
+    }
 
 
 def search(request):
