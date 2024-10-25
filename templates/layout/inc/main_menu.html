@@ -11,7 +11,12 @@
             <a href="{% url 'bboard:rubrics' %}"><li>Рубрики</li></a>
             {% endif %}
             {% endif %}
-            <a href="{% url 'bboard:search' %}"><li>Поиск</li></a>
+            <form action="{% url 'bboard:search' %}" method="get" class="search">
+                <input type="search" placeholder="Введите название..." name="q" required="">
+                <button type="submit" >
+                    <span aria-hidden="true"></span>
+                </button>
+            </form>
                     {% if user.is_anonymous %}
             <a href="{% url 'login' %}"><li>Войти</li></a>
             <a href="{% url 'register' %}"><li>Регистрация</li></a>

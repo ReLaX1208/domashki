@@ -1,22 +1,23 @@
-{% extends "layout/basic.html" %}
-
+{% extends 'layout/basic.html' %}
 {% block content %}
-<h1>НАШИ САМЫЕ ПОПУЛЯРНЫЕ БРЕНДЫ</h1>
-
-        {% for rubric in rubrics %}
-            <div class="b1">
-                            {% if rubric.photo %}
-            <a href="{{ rubric.get_absolute_url }}" class="clickable-div">
-
-            <p class="text-on-top"><img class="imginindex" src="{{rubric.photo.url}}"></p>
+   {% for bb in bbs %}
+    <div class="rubrica">
+        {% url 'bboard:detail' bb.pk as detail_url %}
+        <h2>
+            <a href="{{ detail_url }}">{{ bb.title }}</a>
+        </h2>
+        <p>{{ bb.content }}</p>
+        {% if bb.photo %}
+            <p><img class="imgindetail" src="{{bb.photo.url}}"></p>
         {% endif %}
-
-    </a></div>
-{% endfor %}
-
-
+        <p>{{ bb.published|date:"d.m.Y H:i:s" }}</p>
+        <p><a href="{{ detail_url }}" class="btn btn-primary">Подробнее</a><a href="{% url 'bboard:index' %}"><input type="button" value="Отмена" class="btn btn-primary" /></a></p>
+    </div>
+    {% empty %}
+        <h2>Объявлений нет</h2>
+    {% endfor %}
 {% endblock %}
-    {% block da %}
+{% block da %}
     <div class="paginator">
         Страница {{ page.number }} из {{ page.paginator.num_pages }}
         {% if page.has_other_pages %}
@@ -26,14 +27,14 @@
                 {% if page.has_previous %}
                     <li class="page-item">
                         <a class="page-link"
-                           href="?page={{ page.previous_page_number }}">Назад</a>
+                           href="?{{ q }}page={{ page.previous_page_number }}"> < </a>
                     </li>
                 {% endif %}
 
                 {% for p in page.paginator.page_range %}
                     {% if not p == page.number %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ p }}">{{ p }}</a>
+                            <a class="page-link" href="?{{ q }}page={{ p }}">{{ p }}</a>
                         </li>
                     {% else %}
                         <li class="page-item active" aria-current="page">
@@ -46,14 +47,14 @@
                 {% if page.has_next %}
                     <li class="page-item">
                         <a class="page-link"
-                           href="?page={{ page.next_page_number }}">Вперёд</a>
+                           href="?{{ q }}page={{ page.next_page_number }}"> > </a>
                     </li>
                 {% endif %}
 
             </ul>
         </nav>
     </div>
-    
+
 
     {% endif %}
     {% endblock %}

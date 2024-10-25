@@ -4,6 +4,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, PasswordChangeView
 from django.core.paginator import Paginator
+from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Count
 from django.forms.formsets import ORDERING_FIELD_NAME
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect, HttpResponseNotFound, \
@@ -22,23 +23,19 @@ from django.views.generic.edit import CreateView, FormView, UpdateView, DeleteVi
 from bboard.forms import BbForm, RubricFormSet, RubricForm, RegisterUserForm, LoginUserForm, SearchForm, \
     UserPasswordChangeForm, ProfileUserForm, UploadFileForm
 from bboard.models import Bb, Rubric, UploadFiles
+from django.contrib import messages
 
 
 def index(request):
-    bbs = Bb.objects.order_by('-published')
-    rubrics = Rubric.objects.all().order_by_bb_count()
-
-    paginator = Paginator(bbs, 6)
-
+    rubrics = Rubric.objects.order_by_bb_count()
+    paginator = Paginator(rubrics, 6)
     if 'page' in request.GET:
         page_num = request.GET['page']
     else:
         page_num = 1
-
     page = paginator.get_page(page_num)
-
-    context = {'rubrics': rubrics, 'bbs': page.object_list, 'page': page}
-
+    bbs = Bb.objects.order_by('-published')
+    context = {'rubrics': page.object_list, 'bbs': bbs, 'page': page}
     return render(request, 'bboard/index.html', context)
 
 
@@ -56,20 +53,11 @@ class BbIndexView(ArchiveIndexView):
         return context
 
 
-def by_rubric(request, rubric_id):
-    rubrics = Rubric.objects.annotate(cnt=Count('bb')).filter(cnt__gt=0)
-    current_rubric = Rubric.objects.get(pk=rubric_id)
-    bbs = get_list_or_404(Bb, rubric=rubric_id)
-
-    context = {'bbs': bbs, 'rubrics': rubrics, 'current_rubric': current_rubric}
-
-    return render(request, 'bboard/by_rubric.html', context)
 
 
 class BbByRubricView(ListView):
     template_name = 'bboard/by_rubric.html'
     context_object_name = 'bbs'
-
     def get_queryset(self):
         rubric = Rubric.objects.get(pk=self.kwargs['rubric_id'])
         return rubric.bb_set(manager='by_price').all()
@@ -78,6 +66,13 @@ class BbByRubricView(ListView):
         context = super().get_context_data(**kwargs)
         context['rubrics'] = Rubric.objects.annotate(cnt=Count('bb')).filter(cnt__gt=0)
         context['current_rubric'] = Rubric.objects.get(pk=self.kwargs['rubric_id'])
+        paginator = Paginator(self.object_list, 6)
+
+        page_num = self.request.GET.get('page', 1)
+        page = paginator.get_page(page_num)
+
+        context['bbs'] = page.object_list
+        context['page'] = page
         return context
 
 
@@ -136,6 +131,10 @@ def edit(request, pk):
         if bbf.is_valid():
             if bbf.has_changed():
                 bbf.save()
+                messages.add_message(request, messages.SUCCESS, 'Объявление исправлено!',
+                                     extra_tags='alert alert-success')
+                messages.success(request, 'Объявление исправлено!',
+                                 extra_tags='alert alert-success')
             return HttpResponseRedirect(
                 reverse('bboard:by_rubric', kwargs={'rubric_id': bbf.cleaned_data['rubric'].pk}))
         else:
@@ -229,17 +228,14 @@ class RubricDeleteView(LoginRequiredMixin, DeleteView):
         context['rubric'] = Rubric.objects.get(pk=self.kwargs['pk'])
         return context
 
-    # def get_object(self, queryset=None):
-    #     return Rubric.objects.get(pk=self.kwargs['pk'])
 
 
 @login_required(login_url='login')
 @require_http_methods(['GET', 'POST'])
 def rubrics(request):
-    bbs = Bb.objects.order_by('-published')
-    rubrics = Rubric.objects.all().order_by_bb_count()
+    rubrics = Rubric.objects.order_by_bb_count()
 
-    paginator = Paginator(bbs, 6)
+    paginator = Paginator(rubrics, 6)
 
     if 'page' in request.GET:
         page_num = request.GET['page']
@@ -248,28 +244,35 @@ def rubrics(request):
 
     page = paginator.get_page(page_num)
 
-    context = {'rubrics': rubrics, 'bbs': page.object_list, 'page': page}
+    bbs = Bb.objects.order_by('-published')
+
+    context = {'rubrics': page.object_list, 'bbs': bbs, 'page': page}
 
     return render(request, 'bboard/rubrics.html', context)
 
 
-def search(request):
-    if request.method == 'POST':
-        sf = SearchForm(request.POST)
-        if sf.is_valid():
-            keyword = sf.cleaned_data['keyword']
-            rubric_id = sf.cleaned_data['rubric'].pk
-            bbs = Bb.objects.filter(title__iregex=keyword,
-                                    rubric=rubric_id)
+class Search(ListView):
+    paginate_by = 3
 
-            context = {'bbs': bbs, 'form': sf}
-            return render(request, 'bboard/search.html', context)
-    else:
-        sf = SearchForm()
+    def get_queryset(self):
+        query = self.request.GET.get("q")
+        if query:
+            return Bb.objects.filter(title__icontains=query)
+        return Bb.objects.none()
 
-    context = {'form': sf}
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['bbs'] = Bb.objects.order_by('-published')
+        if 'bb_id' in self.kwargs:
+            context['current_bb'] = Bb.objects.get(pk=self.kwargs['bb_id'])
+        paginator = Paginator(self.object_list, self.paginate_by)
+        page_num = self.request.GET.get('page', 1)
+        page = paginator.get_page(page_num)
 
-    return render(request, 'bboard/search.html', context)
+        context['bbs'] = page.object_list
+        context['page'] = page
+        context["q"] = f'q={self.request.GET.get("q")}&'
+        return context
 
 
 class RegisterUser(CreateView):
