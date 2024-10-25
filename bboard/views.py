@@ -76,22 +76,24 @@ class BbByRubricView(ListView):
         return context
 
 
-class RubCreateView(LoginRequiredMixin, CreateView):
+class RubCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     template_name = 'bboard/create2.html'
     form_class = RubricForm
     success_url = reverse_lazy('bboard:index')
+    success_message = 'Рубрика "%(name)s" создано'
 
 
-class BbCreateView(LoginRequiredMixin, CreateView):
+
+class BbCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     template_name = 'bboard/create.html'
     form_class = BbForm
     success_url = '/{rubric_id}'
+    success_message = 'Объявление "%(title)s" создано'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['rubrics'] = Rubric.objects.annotate(cnt=Count('bb')).filter(cnt__gt=0)
         return context
-
 
 class BbEditView(LoginRequiredMixin, UpdateView):
     model = Bb
@@ -116,6 +118,8 @@ def edit_rubric(request, pk):
         form = RubricForm(request.POST, request.FILES, instance=rubric)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Рубрика исправлена!',
+                                 extra_tags='alert alert-success')
             return redirect('bboard:index')
     else:
         form = RubricForm(instance=rubric)

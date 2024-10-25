@@ -161,6 +161,25 @@ textarea{
     background: #f1f1f1;
     height:100px;
 }
+.success{
+top:70px
+--bs-alert-color: var(--bs-success-text-emphasis);
+    --bs-alert-bg: var(--bs-success-bg-subtle);
+    --bs-alert-border-color: var(--bs-success-border-subtle);
+    --bs-alert-link-color: var(--bs-success-text-emphasis);
+    --bs-alert-padding-x: 30px;
+    --bs-alert-padding-y: 100px;
+    --bs-alert-margin-bottom: -70px;
+    --bs-alert-border: var(--bs-border-width) solid var(--bs-alert-border-color);
+    --bs-alert-border-radius: var(--bs-border-radius);
+    padding: var(--bs-alert-padding-y) var(--bs-alert-padding-x);
+    margin-bottom: -10px;
+    position:relative;
+    color: var(--bs-alert-color);
+    background-color: var(--bs-alert-bg);
+    border: var(--bs-alert-border);
+    border-radius: var(--bs-alert-border-radius);
+}
 .pagination{
     padding-left: 38px;
     padding-top: 10px;
