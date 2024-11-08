@@ -19,6 +19,7 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import CreateView, FormView, UpdateView, DeleteView
+from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -27,7 +28,7 @@ from bboard.forms import BbForm, RubricFormSet, RubricForm, RegisterUserForm, Lo
 from bboard.models import Bb, Rubric, UploadFiles
 from django.contrib import messages
 
-from bboard.serializers import RubricSerializer
+from bboard.serializers import RubricSerializer, UserSerializer
 
 
 def index(request):
@@ -371,3 +372,14 @@ def api_rubric_detail(request, pk):
     rubric = Rubric.objects.get(pk=pk)
     serializer = RubricSerializer(rubric)
     return Response(serializer.data)
+class UserCreateView(generics.CreateAPIView):
+    serializer_class = UserSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        return Response({
+            "user": serializer.data,
+            "message": "User  created successfully."
+        }, status=status.HTTP_201_CREATED)
