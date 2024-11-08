@@ -4,6 +4,7 @@
 
 {% block title %}Изменение рубрики{% endblock %}
 {% block content %}
+<div class="rubrics">
 <h2>Изменение рубрики</h2>
     <form method="post" enctype="multipart/form-data" class="loginform">
         {% csrf_token %}
@@ -11,4 +12,5 @@
         <button type="submit" class="btn btn-primary">Изменить</button> |
         <a href="{% url 'bboard:delete_rubric' rubric.pk %}" class="btn btn-primary">Удалить</a>
     </form>
+</div>
 {% endblock %}

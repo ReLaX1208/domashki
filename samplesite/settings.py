@@ -44,8 +44,11 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'bboard.apps.BboardConfig',
     'testapp',
+    'rest_framework',
+    'corsheaders',
     'precise_bbcode',
     'django_bootstrap5',
+    'django_cleanup',
 ]
 
 SITE_ID = 1
@@ -55,6 +58,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -149,3 +153,6 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'bboard.authentication.EmailAuthBackend',
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_URLS_REGEX = r'^/api/.*$'

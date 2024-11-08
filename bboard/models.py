@@ -72,7 +72,7 @@ class Bb(models.Model):
 
     kind = models.CharField(max_length=1, choices=KINDS, default='s')
 
-    rubric = models.ForeignKey('Rubric', null=True, on_delete=models.PROTECT,
+    rubric = models.ForeignKey('Rubric', null=True, on_delete=models.CASCADE ,
                                verbose_name='Рубрика')
     title = models.CharField(max_length=50, verbose_name='Товар',
                              validators=[

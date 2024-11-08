@@ -1,6 +1,7 @@
 {% extends "layout/basic.html" %}
 
 {% block content %}
+<div class="rubrics">
 {% for rubric in rubrics %}
             <div class="b1">
                     <h2>{{rubric.name}}</h2>
@@ -18,10 +19,10 @@
     {% empty %}
         <h2>Рубрик нет</h2>
     {% endfor %}
+</div>
 {% endblock %}
 {% block da %}
     <div class="paginator">
-        Страница {{ page.number }} из {{ page.paginator.num_pages }}
         {% if page.has_other_pages %}
         <nav aria-label="pagination" class="pagination">
             <ul class="pagination">
@@ -55,8 +56,8 @@
 
             </ul>
         </nav>
-    </div>
 
 
     {% endif %}
+            </div>
     {% endblock %}

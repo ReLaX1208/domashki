@@ -4,6 +4,7 @@
 
 {% block title %}Изменение объявления{% endblock %}
 {% block content %}
+<div class="rubrics">
 <h2>Изменение объявления</h2>
     <form method="post" enctype="multipart/form-data" class="loginform">
         {% csrf_token %}
@@ -11,4 +12,5 @@
         <button type="submit" class="btn btn-primary">Изменить</button> |
         <a href="{% url 'bboard:index' %}"><input type="button" value="Отмена" class="btn btn-primary" /></a>
     </form>
+</div>
 {% endblock %}

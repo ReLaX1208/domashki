@@ -19,11 +19,15 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.base import TemplateView, RedirectView
 from django.views.generic.edit import CreateView, FormView, UpdateView, DeleteView
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 from bboard.forms import BbForm, RubricFormSet, RubricForm, RegisterUserForm, LoginUserForm, SearchForm, \
-    ProfileUserForm, UploadFileForm, UserSetNewPasswordForm, UserForgotPasswordForm
+    ProfileUserForm, UploadFileForm, UserSetNewPasswordForm, UserForgotPasswordForm, UserPasswordChangeForm
 from bboard.models import Bb, Rubric, UploadFiles
 from django.contrib import messages
+
+from bboard.serializers import RubricSerializer
 
 
 def index(request):
@@ -80,7 +84,7 @@ class RubCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     template_name = 'bboard/create2.html'
     form_class = RubricForm
     success_url = reverse_lazy('bboard:index')
-    success_message = 'Рубрика "%(name)s" создано'
+    success_message = 'Рубрика "%(name)s" создана'
 
 
 
@@ -118,6 +122,8 @@ def edit_rubric(request, pk):
         form = RubricForm(request.POST, request.FILES, instance=rubric)
         if form.is_valid():
             form.save()
+            messages.add_message(request, messages.SUCCESS, 'Рубрика исправлена!',
+                                     extra_tags='alert alert-success')
             messages.success(request, 'Рубрика исправлена!',
                                  extra_tags='alert alert-success')
             return redirect('bboard:index')
@@ -207,6 +213,22 @@ class BbDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context['rubrics'] = Rubric.objects.annotate(cnt=Count('bb')).filter(cnt__gt=0)
         return context
+
+class UserPasswordChangeView(SuccessMessageMixin, PasswordChangeView):
+    """
+    Изменение пароля пользователя
+    """
+    form_class = UserPasswordChangeForm
+    template_name = 'registration/user_password_change.html'
+    success_message = 'Ваш пароль был успешно изменён!'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Изменение пароля на сайте'
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy('profile')
 
 
 class BbRedirectView(RedirectView):
@@ -336,3 +358,16 @@ class ProfileUser(LoginRequiredMixin, UpdateView):
 
 def about(request):
     return render(request, 'bboard/about.html')
+
+@api_view(['GET'])
+def api_rubrics(request):
+    rubrics = Rubric.objects.all()
+    serializer = RubricSerializer(rubrics, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def api_rubric_detail(request, pk):
+    rubric = Rubric.objects.get(pk=pk)
+    serializer = RubricSerializer(rubric)
+    return Response(serializer.data)

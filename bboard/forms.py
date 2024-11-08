@@ -25,7 +25,7 @@ class BbForm(ModelForm):
 
     def clean_title(self):
         val = self.cleaned_data['title']
-        if val == 'Прошлогодний снег':
+        if val == '':
             raise ValidationError('К продаже не допускается')
         return val
 
@@ -130,7 +130,22 @@ class UserForgotPasswordForm(PasswordResetForm):
                 'autocomplete': 'off'
             })
 
+from django.contrib.auth.forms import SetPasswordForm
 
+class UserPasswordChangeForm(SetPasswordForm):
+    """
+    Форма изменения пароля
+    """
+    def __init__(self, *args, **kwargs):
+        """
+        Обновление стилей формы
+        """
+        super().__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control',
+                'autocomplete': 'off'
+            })
 class UserSetNewPasswordForm(SetPasswordForm):
     """
     Изменение пароля пользователя после подтверждения

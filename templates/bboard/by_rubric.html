@@ -2,6 +2,7 @@
 
 
 {% block content %}
+<div class="rubrics">
 <h2>{{ current_rubric }}</h2>
     {% for bb in bbs %}
     <div class="rubrica">
@@ -19,10 +20,11 @@
     {% empty %}
         <h2>Объявлений нет</h2>
     {% endfor %}
+</div>
 {% endblock %}
+
 {% block da %}
     <div class="paginator">
-        Страница {{ page.number }} из {{ page.paginator.num_pages }}
         {% if page.has_other_pages %}
         <nav aria-label="pagination" class="pagination">
             <ul class="pagination">
@@ -56,8 +58,7 @@
 
             </ul>
         </nav>
-    </div>
-
 
     {% endif %}
+            </div>
     {% endblock %}

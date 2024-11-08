@@ -1,14 +1,14 @@
 {% extends "layout/basic.html" %}
+{% load django_bootstrap5 %}
 {% block content %}
+<div class="rubrics">
 <h1>Профиль</h1>
-<form method="post">
+<form method="post" class="loginform">
 {% csrf_token %}
-  <div class="form-error">{{ form.non_field_errors }}</div>
-{% for f in form %}
-<p><label class="form-label" for="{{ f.id_for_label }}">{{f.label}}:</label>{{ f }}</p>
-<div class="form-error">{{ f.errors }}</div>
-{% endfor %}
-  <p><a href="{% url 'password_change' %}">Сменить пароль</a></p>
-<p><button type="submit">Сохранить</button></p>
+
+          {% bootstrap_form form layout='horizontal' show_help=False size='sm' %}
+    <p><a href="{% url 'password_change' %}">Сменить пароль</a></p>
+{% bootstrap_button 'Сохранить' %}
 </form>
+</div>
 {% endblock %}

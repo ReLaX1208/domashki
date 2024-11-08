@@ -5,10 +5,12 @@
 {% block title %}Добавление объявления{% endblock %}
 
 {% block content %}
+<div class="rubrics">
 <h2>Добавление объявления</h2>
     <form method="post" enctype="multipart/form-data" class="loginform">
         {% csrf_token %}
         {% bootstrap_form form layout='horizontal' show_help=False size='sm' %}
         {% bootstrap_button 'Добавить' %}
     </form>
+</div>
 {% endblock %}

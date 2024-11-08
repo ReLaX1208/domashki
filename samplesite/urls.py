@@ -22,7 +22,8 @@ from django.contrib.auth.views import LogoutView, PasswordChangeDoneView, Passwo
     PasswordResetConfirmView, PasswordResetCompleteView
 from django.urls import path, include, reverse_lazy
 
-from bboard.views import LoginUser, RegisterUser, ProfileUser, UserForgotPasswordView, UserPasswordResetConfirmView
+from bboard.views import LoginUser, RegisterUser, ProfileUser, UserForgotPasswordView, UserPasswordResetConfirmView, \
+    UserPasswordChangeView
 from samplesite import settings
 
 urlpatterns = [
@@ -35,6 +36,7 @@ urlpatterns = [
     path('set-new-password/<uidb64>/<token>/', UserPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('', include('bboard.urls', namespace='bboard')),
     path('profile/', ProfileUser.as_view(), name='profile'),
+    path('password-change/', UserPasswordChangeView.as_view(), name='password_change'),
 ]
 urlpatterns += [
     path('captcha/', include('captcha.urls')),

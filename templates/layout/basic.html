@@ -19,9 +19,12 @@
 {#            <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>#}
 {#                {{ message }}#}
 {#            </li>#}
-            <div{% if message.tags %} class="{{ message.tags }}" {% endif %}>
+    <ul class="alert alert-success success">
+            <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>
                 {{ message }}
-            </div>
+            </li>
+    </ul>
+
         {% endfor %}
 {#        </ul>#}
     {% endif %}
@@ -30,14 +33,13 @@
 
 {% endblock %}
 
-<div class="rubrics">
-    {% block content %}
+{% block content %}
 
-    {% endblock %}
-    {% block da %}
+{% endblock %}
+{% block da %}
 
-    {% endblock %}
-</div>
+{% endblock %}
+
 {% include 'layout/inc/footer.html' %}
 {% bootstrap_javascript %}
 </body>
